@@ -2,16 +2,15 @@ package com.djodar.katas.tennisgame
 
 class TennisGame(val player1: Player, val player2: Player) {
 
-  private def whoWins(player1: Player, player2: Player): Option[String] = (player1.score, player2.score) match {
-    case (s1, s2) if s1 == s2 => Option.empty
-    case (s1, s2) if s1 > s2 => Option(player1.name)
-    case (s1, s2) if s1 < s2 => Option(player2.name)
+  private def whoWins(player1: Player, player2: Player): String = (player1.score, player2.score) match {
+    case (s1, s2) if s1 > s2 => player1.name
+    case (s1, s2) if s1 < s2 => player2.name
   }
 
   def score: String = (player1.score, player2.score, whoWins(player1, player2)) match {
-    case (s1, s2, name) if hasReachedPoints(3, s1, s2) && hasAdvantage(1, s1, s2) => "advantage " + name.get
+    case (s1, s2, name) if hasReachedPoints(3, s1, s2) && hasAdvantage(1, s1, s2) => "advantage " + name
     case (s1, s2, _) if hasReachedPoints(3, s1, s2) && s1 == s2 => "deuce"
-    case (s1, s2, name) if hasAnyReachedPoints(4, s1, s2) && hasAdvantage(2, s1, s2) => name.get + " won"
+    case (s1, s2, name) if hasAnyReachedPoints(4, s1, s2) && hasAdvantage(2, s1, s2) => name + " won"
     case (s1, s2, _) => getScoreName(s1) + ", " + getScoreName(s2)
   }
 
