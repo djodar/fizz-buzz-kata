@@ -4,6 +4,10 @@ import java.time.LocalDate
 
 import scala.util.{Failure, Success, Try}
 
+/**
+  * Algebra-based API design. Module contains API definition implemented with this trait.
+  *
+  * Algebra laws are modeled as properties */
 trait AccountService[Account, Amount, Balance] {
   def open(no: String, name: String, openDate: Option[LocalDate]): Try[Account]
 
@@ -23,7 +27,7 @@ trait AccountService[Account, Amount, Balance] {
 
 case class Account(number: String, name: String, dateOfOpen: LocalDate, dateOfClose: Option[LocalDate] = None, balance: BigDecimal = 0)
 
-// interpreter
+// interpreter of the algebra
 object AccountService extends AccountService[Account, BigDecimal, BigDecimal] {
 
   def today: LocalDate = LocalDate.now()
