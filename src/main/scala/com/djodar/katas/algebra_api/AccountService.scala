@@ -38,13 +38,22 @@ object AccountService extends AccountService[Account, BigDecimal, BigDecimal] {
     }
   }
 
-  override def close(account: Account, closeDate: Option[LocalDate]): Try[Account] = ???
+  override def close(account: Account, closeDate: Option[LocalDate]): Try[Account] = {
+    val cd = closeDate.getOrElse(today)
+    if (cd.isBefore(account.dateOfOpen))
+      Failure(new Exception(s"Close date $cd cannot be before opening date ${account.dateOfOpen}"))
+    else Success(account.copy(dateOfClose = Some(cd)))
+  }
 
-  override def debit(account: Account, amount: BigDecimal): Try[Account] =
-    Try(Account(account.number, account.number, account.dateOfOpen, balance = account.balance - amount))
+  override def debit(account: Account, amount: BigDecimal): Try[Account] = {
+    require(amount > 0, "Amount to debit must be > 0")
+    if (amount > account.balance)
+      Failure(new Exception("Insufficient funds"))
+    else Success(account.copy(balance = account.balance - amount))
+  }
 
   override def credit(account: Account, amount: BigDecimal): Try[Account] =
-    Try(Account(account.number, account.number, account.dateOfOpen, balance = account.balance + amount))
+    Success(account.copy(balance = account.balance + amount))
 
   override def balance(account: Account): Try[BigDecimal] = Try(account.balance)
 }
