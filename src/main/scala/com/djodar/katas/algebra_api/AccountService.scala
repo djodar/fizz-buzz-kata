@@ -8,7 +8,7 @@ import scala.util.{Failure, Success, Try}
   * Algebra-based API design. Module contains API definition implemented with this trait.
   *
   * Algebra laws are modeled as properties */
-trait AccountService[Account, Amount, Balance] {
+sealed trait AccountService[Account, Amount, Balance] {
   def open(no: String, name: String, openDate: Option[LocalDate]): Try[Account]
 
   def close(account: Account, closeDate: Option[LocalDate]): Try[Account]
@@ -20,12 +20,10 @@ trait AccountService[Account, Amount, Balance] {
   def balance(account: Account): Try[Balance]
 
   def transfer(from: Account, to: Account, amount: Amount): Try[(Account, Account, Amount)] = for {
-    a <- debit(from, amount)
-    b <- credit(to, amount)
+  a <- debit(from, amount)
+  b <- credit(to, amount)
   } yield (a, b, amount)
 }
-
-case class Account(number: String, name: String, dateOfOpen: LocalDate, dateOfClose: Option[LocalDate] = None, balance: BigDecimal = 0)
 
 // interpreter of the algebra
 object AccountService extends AccountService[Account, BigDecimal, BigDecimal] {
@@ -38,7 +36,7 @@ object AccountService extends AccountService[Account, BigDecimal, BigDecimal] {
     else if (openDate.getOrElse(today) isBefore today) {
       Failure(new Exception("Provided opening date is in the past."))
     } else {
-      Success(Account(no, name, openDate.getOrElse(today)))
+      Account.checkingAccount(no, name, openDate.getOrElse(today))
     }
   }
 
