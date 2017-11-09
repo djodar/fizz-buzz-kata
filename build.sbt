@@ -9,8 +9,10 @@ lazy val root = (project in file(".")).
     )),
     name := "scala-katas",
     libraryDependencies ++= Seq(
+      cats,
       scalaTest % Test,
-//      scalaz,
       scalaCheck % Test
     )
   )
+
+scalacOptions += "-Ypartial-unification"
